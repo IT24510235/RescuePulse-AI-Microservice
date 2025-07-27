@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-EmergencyShield</title>
-    
+
     <!-- Tailwind CSS is used for rapid UI development -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <style>
         /* ========================================
         FONTS
@@ -58,7 +58,7 @@
 
         /* A subtle outer glow to make the panel pop */
         .panel-glow {
-             box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
         }
 
         /* ========================================
@@ -102,133 +102,151 @@
 </head>
 <body class="bg-gray-900 text-white">
 
-    <!-- Main container that holds the background and all content -->
-    <div id="main-container" class="relative min-h-screen w-full flex flex-col items-center justify-center p-4">
-        
-        <!-- A dark overlay to ensure text is readable against the background -->
-        <div class="absolute inset-0 bg-black/50 z-0"></div>
+<!-- Main container that holds the background and all content -->
+<div id="main-container" class="relative min-h-screen w-full flex flex-col items-center justify-center p-4">
 
-        <!-- Header / Navigation Section -->
-        <header class="absolute top-0 left-0 right-0 z-20 p-4 md:p-6">
-            <nav class="container mx-auto flex justify-between items-center">
-                <!-- Logo -->
+    <!-- A dark overlay to ensure text is readable against the background -->
+    <div class="absolute inset-0 bg-black/50 z-0"></div>
+
+    <!-- Header / Navigation Section -->
+    <header class="absolute top-0 left-0 right-0 z-20 p-4 md:p-6">
+        <nav class="container mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 14v-1m-6.08-4.92l.707-.707m9.856 0l-.707-.707M4 12H3m18 0h-1m-5.92-6.08l-.707.707m0 9.856l.707.707"></path></svg>
+                <span class="text-2xl font-bold tracking-wider">RescuePulse</span>
+            </div>
+
+            <!-- Desktop Navigation Links -->
+            <div class="hidden md:flex items-center space-x-8 text-gray-300">
+                <a href="docs.html" class="hover:text-white transition-colors">Docs</a>
+                <a href="aboutus.html" class="hover:text-white transition-colors">About</a>
+                <a href="sign-in.html" class="hover:text-white transition-colors">Sign In</a>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="hidden md:flex items-center space-x-4">
+                <a href="sign-in.html" class="px-5 py-2 rounded-full border border-white/50 text-white hover:bg-white/10 transition-colors">Sign In</a>
+                <a href="sign-up.html" class="px-5 py-2 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition-colors">Sign Up</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4 bg-black/30 backdrop-blur-md rounded-lg">
+            <a href="docs.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Docs</a>
+            <a href="aboutus.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">About</a>
+            <a href="sign-in.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign In</a>
+            <a href="sign-up.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign Up</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight">
+            AI-EmergencyShield
+        </h1>
+        <p class="mt-4 text-lg text-gray-300 max-w-2xl">
+            Disaster response platform for Sri Lanka.
+        </p>
+
+        <!-- The main interactive glass panel -->
+        <div id="interactive-panel" class="relative w-full max-w-4xl mt-10 glass-panel rounded-2xl p-4 md:p-6 panel-glow">
+            <!-- Panel Header -->
+            <div class="flex justify-between items-center text-gray-400 text-xs mb-4">
                 <div class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 14v-1m-6.08-4.92l.707-.707m9.856 0l-.707-.707M4 12H3m18 0h-1m-5.92-6.08l-.707.707m0 9.856l.707.707"></path></svg>
-                    <span class="text-2xl font-bold tracking-wider">RescuePulse</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16" /></svg>
                 </div>
-
-                <!-- Desktop Navigation Links -->
-                <div class="hidden md:flex items-center space-x-8 text-gray-300">
-                    <a href="#" class="hover:text-white transition-colors">Solutions</a>
-                    <a href="#" class="hover:text-white transition-colors">Docs</a>
-                    <a href="#" class="hover:text-white transition-colors">About</a>
-                    <a href="#" class="hover:text-white transition-colors">Sign in</a>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="#" class="px-5 py-2 rounded-full border border-white/50 text-white hover:bg-white/10 transition-colors">Sign in</a>
-                    <a href="#" class="px-5 py-2 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition-colors">Sign Up</a>
-                </div>
-                
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open menu">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
-                </div>
-            </nav>
-             <!-- Mobile Menu (hidden by default) -->
-            <div id="mobile-menu" class="hidden md:hidden mt-4 bg-black/30 backdrop-blur-md rounded-lg">
-                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Solutions</a>
-                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Docs</a>
-                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">About</a>
-                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign In</a>
-                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign Up</a>
-            </div>
-        </header>
-
-        <!-- Main Content Area -->
-        <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
-            <h1 class="text-5xl md:text-6xl font-bold tracking-tight">
-                AI-EmergencyShield
-            </h1>
-            <p class="mt-4 text-lg text-gray-300 max-w-2xl">
-                Disaster response platform for Sri Lanka.
-            </p>
-
-            <!-- The main interactive glass panel -->
-            <div id="interactive-panel" class="relative w-full max-w-4xl mt-10 glass-panel rounded-2xl p-4 md:p-6 panel-glow">
-                <!-- Panel Header -->
-                <div class="flex justify-between items-center text-gray-400 text-xs mb-4">
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16" /></svg>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <span>A</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
-                    </div>
-                </div>
-
-                <div class="flex flex-col md:flex-row gap-4 md:gap-8">
-                    <!-- Left Side Data Readout -->
-                    <div class="w-full md:w-1/4 space-y-4 text-left text-sm text-gray-300 font-mono">
-                        <p>9H 01:58:17</p>
-                        <p>180M / 128D</p>
-                        <p>5720.8M</p>
-                        <p>50050.5M</p>
-                        <p>30.07.19 22:07</p>
-                    </div>
-                    
-                    <!-- Map Area -->
-                    <div class="relative w-full md:w-3/4 h-64 md:h-auto">
-                        <!-- CHANGED TO RELATIVE PATH -->
-                        <img src="assets/images/map.png" class="absolute inset-0 w-full h-full object-contain" alt="Map of Sri Lanka with glowing nodes" style="filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.5));">
-                    </div>
-                </div>
-
-                <!-- Activate Shield Button -->
-                <div class="mt-8 text-center">
-                    <a href="#" id="activate-button" class="inline-block bg-orange-500 text-white font-bold text-lg px-16 py-4 rounded-full glow-button">
-                        Activate Shield
-                    </a>
+                <div class="flex items-center space-x-2">
+                    <span>A</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
                 </div>
             </div>
-            
-            <!-- Decorative wavy lines at the bottom -->
-            <div class="absolute bottom-0 left-0 w-full h-48 opacity-20 overflow-hidden -z-10">
-                <svg class="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                    <path class="wavy-line" fill="none" stroke="#06b6d4" stroke-width="2" d="M0,224L40,213.3C80,203,160,181,240,186.7C320,192,400,224,480,213.3C560,203,640,149,720,149.3C800,149,880,203,960,224C1040,245,1120,235,1200,208C1280,181,1360,139,1400,117.3L1440,96"></path>
-                     <path class="wavy-line" style="animation-delay: 1.5s;" fill="none" stroke="#22d3ee" stroke-width="1" d="M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128"></path>
-                </svg>
+
+            <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+                <!-- Left Side Data Readout -->
+                <div class="w-full md:w-1/4 space-y-4 text-left text-sm text-gray-300 font-mono">
+                    <p>9H 01:58:17</p>
+                    <p>180M / 128D</p>
+                    <p>5720.8M</p>
+                    <p>50050.5M</p>
+                    <p>30.07.19 22:07</p>
+                </div>
+
+                <!-- Map Area -->
+                <div class="relative w-full md:w-3/4 h-64 md:h-auto">
+                    <!-- CHANGED TO RELATIVE PATH -->
+                    <img src="assets/images/map.png" class="absolute inset-0 w-full h-full object-contain" alt="Map of Sri Lanka with glowing nodes" style="filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.5));">
+                </div>
             </div>
-             <!-- Note: The people in the foreground are part of the background image and are not separate elements. -->
-        </main>
-    </div>
 
-    <script>
-        // This script waits for the page to load before running.
-        document.addEventListener('DOMContentLoaded', function() {
+            <!-- Activate Shield Button -->
+            <div class="mt-8 text-center">
+                <a href="#" id="activate-button" class="inline-block bg-orange-500 text-white font-bold text-lg px-16 py-4 rounded-full glow-button">
+                    Activate Shield
+                </a>
+            </div>
+        </div>
 
-            // --- Mobile Menu Toggle ---
-            // This is the only JavaScript needed for a clean, static UI.
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
+        <!-- Decorative wavy lines at the bottom -->
+        <div class="absolute bottom-0 left-0 w-full h-48 opacity-20 overflow-hidden -z-10">
+            <svg class="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path class="wavy-line" fill="none" stroke="#06b6d4" stroke-width="2" d="M0,224L40,213.3C80,203,160,181,240,186.7C320,192,400,224,480,213.3C560,203,640,149,720,149.3C800,149,880,203,960,224C1040,245,1120,235,1200,208C1280,181,1360,139,1400,117.3L1440,96"></path>
+                <path class="wavy-line" style="animation-delay: 1.5s;" fill="none" stroke="#22d3ee" stroke-width="1" d="M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128"></path>
+            </svg>
+        </div>
+    </main>
+</div>
 
-            // It's good practice to check if the elements were found before adding listeners.
-            if (mobileMenuButton && mobileMenu) {
-                // When the mobile menu button is clicked...
-                mobileMenuButton.addEventListener('click', function() {
-                    // ...it toggles the 'hidden' class on the mobile menu, making it appear or disappear.
-                    mobileMenu.classList.toggle('hidden');
-                });
-            } else {
-                // Log an error to the console if the menu elements aren't found.
-                console.error("Mobile menu button or menu container not found.");
-            }
+<script>
+    // This script waits for the page to load before running.
+    document.addEventListener('DOMContentLoaded', function() {
 
-        });
-    </script>
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
 
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        } else {
+            console.error("Mobile menu button or menu container not found.");
+        }
+
+        // --- Fetch Data from Ballerina ---
+        fetch('http://localhost:9090/emergency')
+            .then(response => response.json())
+            .then(data => {
+                const panel = document.getElementById('interactive-panel');
+                panel.innerHTML += `<p class="mt-4 text-sm text-green-400">Status: ${data.status}, Risk: ${data.riskLevel}, Time: ${data.timestamp}</p>`;
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        // --- Activate Shield Button ---
+        const activateButton = document.getElementById('activate-button');
+        if (activateButton) {
+            activateButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                fetch('http://localhost:9090/emergency/activate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'activate' })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        const panel = document.getElementById('interactive-panel');
+                        panel.innerHTML += `<p class="mt-4 text-sm text-green-400">Shield Activated! New Status: ${data.status}, Risk: ${data.riskLevel}</p>`;
+                    })
+                    .catch(error => console.error('Activation failed:', error));
+            });
+        }
+    });
+</script>
 </body>
 </html>
