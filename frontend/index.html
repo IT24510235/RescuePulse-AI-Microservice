@@ -4,255 +4,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-EmergencyShield</title>
+    
+    <!-- Tailwind CSS is used for rapid UI development -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
+        /* ========================================
+        FONTS
+        ========================================
+        */
+        /* We're importing the 'Inter' font which is clean and modern, similar to the design */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Roboto+Mono:wght@400&display=swap');
+
+        /* ========================================
+        BASE STYLES
+        ========================================
+        */
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
+            /* Sets the default font for the entire page */
+            font-family: 'Inter', sans-serif;
+            /* Prevents horizontal scrolling for a clean look */
+            overflow-x: hidden;
+            /* A dark base color that complements the background */
+            background-color: #0a0a14;
         }
-        .background {
-            background: url('images/homepage.jpeg') no-repeat center center;
-            background-size: contain; /* Fits the image within the screen without cropping */
-            min-height: 100vh; /* Ensures it covers the full viewport height */
-            width: 100vw; /* Full viewport width */
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            /* Optional: Add a fallback background color if image fails to load */
-            background-color: #1a3c3c;
+
+        /* ========================================
+        MAIN CONTAINER & BACKGROUND
+        ========================================
+        */
+        #main-container {
+            /* CHANGED TO RELATIVE PATH */
+            background-image: url('assets/images/homepage.jpeg');
+            /* Ensures the background image covers the entire container */
+            background-size: cover;
+            /* Centers the background image */
+            background-position: center;
         }
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            padding: 20px 50px;
-            box-sizing: border-box;
+
+        /* ========================================
+        THE GLASS PANEL
+        ========================================
+        */
+        .glass-panel {
+            /* Semi-transparent background to create the glass effect */
+            background: rgba(20, 20, 30, 0.4);
+            /* This is the magic for the frosted glass blur */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* For Safari support */
+            /* A subtle border to define the panel's edge */
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .navbar .logo {
-            font-size: 24px;
-            color: #00c4cc;
+
+        /* A subtle outer glow to make the panel pop */
+        .panel-glow {
+             box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
         }
-        .navbar .nav-links {
-            display: flex;
-            align-items: center;
+
+        /* ========================================
+        BUTTONS
+        ========================================
+        */
+        /* Styling for the main "Activate Shield" button */
+        .glow-button {
+            /* The orange glow effect */
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.5), 0 0 30px rgba(251, 146, 60, 0.3);
+            /* Smooth transition for the hover effect */
+            transition: all 0.3s ease-in-out;
         }
-        .navbar .nav-links a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-size: 16px;
-            transition: color 0.3s;
-        }
-        .navbar .nav-links a:hover {
-            color: #00c4cc;
-        }
-        .navbar .sign-in {
-            background: rgba(255, 255, 255, 0.94);
-            border: 1px solid white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
-            margin-left: 15px;
-            transition: background 0.3s;
-        }
-        .navbar .sign-in.filled {
-            background: white;
-            color: #1a3c3c;
-        }
-        .navbar .sign-in:hover {
-            background: rgba(255, 255, 255, 0.98);
-        }
-        .navbar .sign-in.filled:hover {
-            background: #e0e0e0;
-        }
-        .content {
-            text-align: center;
-            padding: 20px;
-            position: relative;
-        }
-        .content h1 {
-            font-size: 48px;
-            margin: 0;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        .content p {
-            font-size: 20px;
-            margin: 10px 0;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
-            color: #f0f0f0;
-        }
-        .map-overlay {
-            background: rgba(255, 255, 255, 0.98);
-            border: 2px solid #00c4cc;
-            border-radius: 10px;
-            padding: 20px;
-            width: 400px;
-            text-align: left;
-            box-shadow: 0 0 10px rgba(0, 196, 204, 0.5);
-            position: absolute;
-            left: 50%;
-            transform: translateX(-60%);
-            top: 50%;
-        }
-        .map-overlay ul {
-            list-style: none;
-            padding: 0;
-        }
-        .map-overlay ul li {
-            margin: 5px 0;
-            font-size: 14px;
-            color: #e0e0e0;
-        }
-        .map-overlay::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-bottom: 20px solid #00c4cc;
-        }
-        .heatmap {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            height: 300px;
-            background: linear-gradient(to bottom, #ff4500, #ff8c00, #ffd700, #00ff00, #00ced1);
-            border: 2px solid white;
-            border-radius: 10px;
-            opacity: 0.7;
-            z-index: -1;
-        }
-        .heatmap::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="5" fill="white"/><circle cx="80" cy="80" r="5" fill="white"/></svg>');
-            opacity: 0.5;
-        }
-        .activate-button {
-            background-color: #ff6200;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background 0.3s, transform 0.2s;
-        }
-        .activate-button:hover {
-            background-color: #e65c00;
+
+        .glow-button:hover {
+            /* Makes the button slightly larger on hover */
             transform: scale(1.05);
+            /* Intensifies the glow on hover */
+            box-shadow: 0 0 25px rgba(251, 146, 60, 0.7), 0 0 45px rgba(251, 146, 60, 0.5);
         }
-        .activate-button::after {
-            content: "Start emergency protection protocol";
-            display: block;
-            font-size: 12px;
-            font-weight: normal;
-            margin-top: 5px;
-            opacity: 0.7;
+
+        /* ========================================
+        WAVY LINES DECORATION
+        ========================================
+        */
+        /* This animation "draws" the SVG lines on screen */
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
         }
-        .human-group {
-            position: absolute;
-            bottom: 20px;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-        }
-        .human-group div {
-            width: 50px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 0 5px;
-            border-radius: 5px;
-            display: flex;
-            align-items: flex-end;
-            padding-bottom: 10px;
-        }
-        .human-group div::before {
-            content: '';
-            width: 10px;
-            height: 20px;
-            background: #00c4cc;
-            position: absolute;
-            transform: rotate(45deg);
-            margin-left: 20px;
-        }
-        .foreground {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 200px;
-            background: #1a3c3c;
-            clip-path: ellipse(70% 100% at 50% 100%);
-        }
-        .foreground::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: 0;
-            width: 100%;
-            height: 100px;
-            background: repeating-linear-gradient(to right, transparent 0, #00c4cc 10px, transparent 20px);
-            opacity: 0.5;
+
+        .wavy-line {
+            /* These two properties set up the line drawing animation */
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            /* The animation will take 5 seconds to complete */
+            animation: draw 5s ease-out forwards;
         }
     </style>
 </head>
-<body>
-<div class="background">
-    <div class="navbar">
-        <div class="logo">RescuePulse<span style="color: #ff6200;">∞</span></div>
-        <div class="nav-links">
-            <a href="#">Solutions</a>
-            <a href="#">Docs</a>
-            <a href="#">About</a>
-            <a href="#">Sign in</a>
-            <button class="sign-in">Sign in</button>
-            <button class="sign-in filled">Sign in</button>
-        </div>
-    </div>
-    <!--
+<body class="bg-gray-900 text-white">
 
-  <div class="content">
-      <h1>AI-EmergencyShield</h1>
-      <p>Disaster response platform in partnership with Sri Lanka</p>
-      <div class="heatmap"></div>
-      <div class="map-overlay">
-          <ul>
-              <li>9°F (-12.8°C)</li>
-              <li>Wind: 10 mph</li>
-              <li>Humidity: 80%</li>
-              <li>Pressure: 1012 hPa</li>
-              <li>Updated: 12:24 PM +0530</li>
-          </ul>
-      </div>
-      <button class="activate-button">Activate Shield</button>
-  </div>
-  -->
-  <!--
-  <div class="foreground"></div>
+    <!-- Main container that holds the background and all content -->
+    <div id="main-container" class="relative min-h-screen w-full flex flex-col items-center justify-center p-4">
+        
+        <!-- A dark overlay to ensure text is readable against the background -->
+        <div class="absolute inset-0 bg-black/50 z-0"></div>
 
-  -->
-    <div class="human-group">
-        <div></div><div></div><div></div><div></div><div></div>
-        <div></div><div></div><div></div><div></div><div></div>
+        <!-- Header / Navigation Section -->
+        <header class="absolute top-0 left-0 right-0 z-20 p-4 md:p-6">
+            <nav class="container mx-auto flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 14v-1m-6.08-4.92l.707-.707m9.856 0l-.707-.707M4 12H3m18 0h-1m-5.92-6.08l-.707.707m0 9.856l.707.707"></path></svg>
+                    <span class="text-2xl font-bold tracking-wider">RescuePulse</span>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8 text-gray-300">
+                    <a href="#" class="hover:text-white transition-colors">Solutions</a>
+                    <a href="#" class="hover:text-white transition-colors">Docs</a>
+                    <a href="#" class="hover:text-white transition-colors">About</a>
+                    <a href="#" class="hover:text-white transition-colors">Sign in</a>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="px-5 py-2 rounded-full border border-white/50 text-white hover:bg-white/10 transition-colors">Sign in</a>
+                    <a href="#" class="px-5 py-2 rounded-full bg-white text-black font-semibold hover:bg-gray-200 transition-colors">Sign Up</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+             <!-- Mobile Menu (hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 bg-black/30 backdrop-blur-md rounded-lg">
+                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Solutions</a>
+                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Docs</a>
+                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">About</a>
+                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign In</a>
+                <a href="#" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign Up</a>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
+            <h1 class="text-5xl md:text-6xl font-bold tracking-tight">
+                AI-EmergencyShield
+            </h1>
+            <p class="mt-4 text-lg text-gray-300 max-w-2xl">
+                Disaster response platform for Sri Lanka.
+            </p>
+
+            <!-- The main interactive glass panel -->
+            <div id="interactive-panel" class="relative w-full max-w-4xl mt-10 glass-panel rounded-2xl p-4 md:p-6 panel-glow">
+                <!-- Panel Header -->
+                <div class="flex justify-between items-center text-gray-400 text-xs mb-4">
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16" /></svg>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span>A</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" /></svg>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+                    <!-- Left Side Data Readout -->
+                    <div class="w-full md:w-1/4 space-y-4 text-left text-sm text-gray-300 font-mono">
+                        <p>9H 01:58:17</p>
+                        <p>180M / 128D</p>
+                        <p>5720.8M</p>
+                        <p>50050.5M</p>
+                        <p>30.07.19 22:07</p>
+                    </div>
+                    
+                    <!-- Map Area -->
+                    <div class="relative w-full md:w-3/4 h-64 md:h-auto">
+                        <!-- CHANGED TO RELATIVE PATH -->
+                        <img src="assets/images/map.png" class="absolute inset-0 w-full h-full object-contain" alt="Map of Sri Lanka with glowing nodes" style="filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.5));">
+                    </div>
+                </div>
+
+                <!-- Activate Shield Button -->
+                <div class="mt-8 text-center">
+                    <a href="#" id="activate-button" class="inline-block bg-orange-500 text-white font-bold text-lg px-16 py-4 rounded-full glow-button">
+                        Activate Shield
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Decorative wavy lines at the bottom -->
+            <div class="absolute bottom-0 left-0 w-full h-48 opacity-20 overflow-hidden -z-10">
+                <svg class="w-full h-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path class="wavy-line" fill="none" stroke="#06b6d4" stroke-width="2" d="M0,224L40,213.3C80,203,160,181,240,186.7C320,192,400,224,480,213.3C560,203,640,149,720,149.3C800,149,880,203,960,224C1040,245,1120,235,1200,208C1280,181,1360,139,1400,117.3L1440,96"></path>
+                     <path class="wavy-line" style="animation-delay: 1.5s;" fill="none" stroke="#22d3ee" stroke-width="1" d="M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128"></path>
+                </svg>
+            </div>
+             <!-- Note: The people in the foreground are part of the background image and are not separate elements. -->
+        </main>
     </div>
-</div>
+
+    <script>
+        // This script waits for the page to load before running.
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- Mobile Menu Toggle ---
+            // This is the only JavaScript needed for a clean, static UI.
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            // It's good practice to check if the elements were found before adding listeners.
+            if (mobileMenuButton && mobileMenu) {
+                // When the mobile menu button is clicked...
+                mobileMenuButton.addEventListener('click', function() {
+                    // ...it toggles the 'hidden' class on the mobile menu, making it appear or disappear.
+                    mobileMenu.classList.toggle('hidden');
+                });
+            } else {
+                // Log an error to the console if the menu elements aren't found.
+                console.error("Mobile menu button or menu container not found.");
+            }
+
+        });
+    </script>
+
 </body>
 </html>
