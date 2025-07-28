@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-EmergencyShield - Sign In</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+
     <!-- Tailwind CSS for rapid UI development -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -145,7 +148,7 @@
     <!-- Main Content Area -->
     <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Sign In</h1>
-        <p class="mt-4 text-lg text-gray-300 max-w-xl">Access AI-EmergencyShield to manage disaster response in Sri Lanka.</p>
+        <p class="mt-4 text-lg text-gray-300 max-w-xl">Access AI-EmergencyShield to manage disaster response in Sri Lanka. <span id="current-time" class="text-sm text-gray-500"></span></p>
 
         <!-- Sign-in Form -->
         <div class="relative w-full max-w-md mt-10 glass-panel rounded-2xl p-6 panel-glow">
@@ -160,7 +163,10 @@
                 </div>
                 <button type="submit" class="w-full px-4 py-2 bg-orange-500 text-white font-bold rounded-full glow-button">Sign In</button>
             </form>
-            <p class="mt-4 text-sm text-gray-400">Don’t have an account? <a href="sign-up.html" class="text-orange-400 hover:underline">Sign up</a></p>
+            <p class="mt-2 text-sm text-gray-400">
+                Don’t have an account? <a href="sign-up.html" class="text-orange-400 hover:underline">Sign up</a> |
+                <a href="#" class="text-orange-400 hover:underline">Forgot Password?</a>
+            </p>
         </div>
     </main>
 </div>
@@ -201,6 +207,16 @@
                 mobileMenu.classList.toggle('hidden');
             });
         }
+
+        // Update current date and time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Colombo', hour12: true });
+            const dateString = now.toLocaleDateString('en-US', { timeZone: 'Asia/Colombo', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('current-time').textContent = `(${dateString}, ${timeString})`;
+        }
+        updateTime(); // Initial call
+        setInterval(updateTime, 1000); // Update every second
     });
 </script>
 </body>

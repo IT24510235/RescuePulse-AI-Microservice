@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - AI-EmergencyShield</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a14;
+            overflow-x: hidden;
+        }
+        #main-container {
+            background-image: url('./assets/images/homepage.jpeg');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-col;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 30, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        .panel-glow {
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
+        }
+        .glow-button {
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
+        .glow-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(251, 146, 60, 0.7);
+        }
+        .wavy-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 5s ease-out forwards;
+        }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        #map { height: 400px; width: 100%; }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        @media (max-width: 768px) {
+            .glass-panel { padding: 1rem; }
+            h2 { font-size: 1.5rem; }
+            #csvForm input, #map { width: 100%; }
+            .glow-button { width: 100%; padding: 0.5rem; }
+            .sidebar { width: 250px; position: fixed; top: 0; left: 0; height: 100%; z-index: 30; }
+            .sidebar.hidden { transform: translateX(-250px); }
+            main { margin-left: 0; }
+        }
+        @media (min-width: 769px) {
+            .sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 20; }
+            main { margin-left: 64px; }
+        }
+    </style>
+</head>
+<body class="text-white">
+
+<div id="main-container" class="relative">
+    <div class="absolute inset-0 bg-black/50 z-0"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar w-64 bg-gray-900/80 p-4 h-screen fixed z-20 md:block">
+        <h3 class="text-xl font-bold mb-4">Menu</h3>
+        <ul class="space-y-2">
+            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Dashboard</a></li>
+            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Alert History</a></li>
+            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Settings</a></li>
+            <li><a href="login.html?logout=true" class="block p-2 hover:bg-gray-700 rounded">Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
+        <header class="p-4">
+            <nav class="flex justify-between">
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+                <div class="hidden md:block">
+                    <a href="login.html?logout=true" class="px-4 py-2 rounded-full border border-white/50 hover:bg-white/10">Logout</a>
+                </div>
+            </nav>
+        </header>
+
+        <div class="container mx-auto p-4">
+            <h2 class="text-4xl font-bold tracking-tight">User Dashboard</h2>
+            <p class="mt-4 text-gray-300 max-w-xl">Upload CSV data, view predictions, and monitor alerts.</p>
+
+            <!-- Glass Panel -->
+            <div id="interactive-panel" class="glass-panel max-w-5xl mt-10 panel-glow">
+                <form id="csvForm" class="space-y-4">
+                    <div>
+                        <input type="file" id="csvFile" accept=".csv" class="w-full p-2 rounded bg-gray-800 border border-gray-700" required>
+                    </div>
+                    <div>
+                        <input type="number" id="temperature" placeholder="Temperature (°C)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                    </div>
+                    <div>
+                        <input type="number" id="humidity" placeholder="Humidity (%)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                    </div>
+                    <div>
+                        <input type="number" id="windSpeed" placeholder="Wind Speed (m/s)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                    </div>
+                    <button type="submit" class="glow-button bg-orange-500 text-white font-bold py-2 px-6 rounded-full">Upload and Predict</button>
+                </form>
+                <div id="predictionResult" class="mt-4 text-lg font-mono text-gray-300"></div>
+                <div id="alertHistory" class="mt-4 text-sm text-gray-400">
+                    <h3 class="font-bold">Alert History</h3>
+                    <ul id="alertList"></ul>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div id="map" class="glass-panel mt-6 panel-glow"></div>
+        </div>
+
+        <!-- Wavy Lines -->
+        <div class="absolute bottom-0 left-0 w-full h-48 opacity-20 overflow-hidden -z-10">
+            <svg class="w-full h-full" viewBox="0 0 1440 320">
+                <path class="wavy-line" fill="none" stroke="#06b6d4" stroke-width="2" d="M0,224L40,213.3C80,203,160,181,240,186.7C320,192,400,224,480,213.3C560,203,640,149,720,149.3C800,149,880,203,960,224C1040,245,1120,235,1200,208C1280,181,1360,139,1400,117.3L1440,96"></path>
+                <path class="wavy-line" style="animation-delay: 1.5s;" fill="none" stroke="#22d3ee" stroke-width="1" d="M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128"></path>
+            </svg>
+        </div>
+    </main>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const csvForm = document.getElementById('csvForm');
+        const predictionResult = document.getElementById('predictionResult');
+        const alertList = document.getElementById('alertList');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const sidebar = document.getElementById('sidebar');
+
+        // Mobile Menu Toggle
+        if (mobileMenuButton && sidebar) {
+            mobileMenuButton.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                if (!sidebar.classList.contains('hidden')) {
+                    sidebar.style.transform = 'translateX(0)';
+                } else {
+                    sidebar.style.transform = 'translateX(-250px)';
+                }
+            });
+        }
+
+        // Initialize Map
+        const map = L.map('map').setView([7.8731, 80.7718], 7); // Centered on Sri Lanka
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        // Fetch and Display Alerts on Map
+        async function updateMap() {
+            try {
+                const response = await fetch('http://localhost:8083/alert/list', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const alerts = await response.json();
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) map.removeLayer(layer);
+                });
+                alerts.forEach(alert => {
+                    L.marker([alert.latitude, alert.longitude]).addTo(map)
+                        .bindPopup(`${alert.location}: ${alert.risk_level} - ${alert.message}`);
+                });
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+        updateMap(); // Initial load
+        setInterval(updateMap, 30000); // Update every 30 seconds
+
+        // CSV Upload and Prediction
+        csvForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('csvFile').files[0];
+            const temperature = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const windSpeed = document.getElementById('windSpeed').value;
+            const formData = new FormData();
+            formData.append('csv', file);
+
+            try {
+                const response = await fetch('http://localhost:8081/data/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    let data = {};
+                    if (file) {
+                        const csvData = await file.text();
+                        const lines = csvData.split('\n').filter(line => line.trim());
+                        data = lines[1].split(','); // Assuming header + first row
+                    } else {
+                        data = [null, null, null, temperature, humidity, windSpeed];
+                    }
+                    const aiResponse = await fetch('http://localhost:8082/ai/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: JSON.stringify({
+                            location: data[0] || 'Unknown',
+                            temperature: parseFloat(data[3] || temperature) || 0,
+                            humidity: parseFloat(data[4] || humidity) || 0,
+                            wind_speed: parseFloat(data[5] || windSpeed) || 0
+                        })
+                    });
+                    const aiResult = await aiResponse.json();
+                    predictionResult.textContent = `Prediction: ${aiResult.risk_level} - ${aiResult.message}`;
+                    updateMap(); // Update map after prediction
+                } else {
+                    predictionResult.textContent = 'Upload failed';
+                }
+            } catch (error) {
+                predictionResult.textContent = 'Error processing data';
+                console.error(error);
+            }
+        });
+
+        // Fetch Alert History
+        async function updateAlertHistory() {
+            try {
+                const response = await fetch('http://localhost:8083/alert/list', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const alerts = await response.json();
+                alertList.innerHTML = alerts.map(alert => `<li>${alert.location} - ${alert.risk_level} (${alert.created_at})</li>`).join('');
+            } catch (error) {
+                alertList.innerHTML = '<li>Error loading history</li>';
+            }
+        }
+        updateAlertHistory(); // Initial load
+        setInterval(updateAlertHistory, 30000); // Update every 30 seconds
+
+        // Logout Handling
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('logout')) {
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        }
+    });
+</script>
+</body>
+</html>
