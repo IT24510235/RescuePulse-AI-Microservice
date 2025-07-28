@@ -49,6 +49,68 @@
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(251, 146, 60, 0.7), 0 0 45px rgba(251, 146, 60, 0.5);
         }
+
+        /* Mobile-responsive adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            nav .flex {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav .space-x-4 {
+                display: none;
+            }
+
+            main {
+                margin-top: 2rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem; /* Reduced from 4xl/5xl */
+                line-height: 1.2;
+            }
+
+            p {
+                font-size: 0.875rem; /* Reduced from 1rem */
+                max-width: 90%;
+                line-height: 1.5;
+            }
+
+            #main-container .max-w-md {
+                max-width: 100%; /* Full width on mobile */
+            }
+
+            .glass-panel {
+                padding: 0.5rem; /* Reduced padding */
+                border-radius: 1rem;
+            }
+
+            .space-y-6 {
+                space-y-4; /* Reduced spacing between form fields */
+            }
+
+            label {
+                font-size: 0.75rem; /* Reduced label size */
+            }
+
+            input {
+                font-size: 0.875rem; /* Reduced input text size */
+                padding: 0.25rem; /* Reduced padding */
+                height: 2rem; /* Fixed height for compactness */
+            }
+
+            .glow-button {
+                padding: 0.5rem 1rem; /* Reduced padding */
+                font-size: 0.875rem; /* Reduced from 1rem */
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -68,7 +130,16 @@
                 <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
                 <a href="sign-in.html" class="text-gray-300 hover:text-white transition-colors">Sign In</a>
             </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
         </nav>
+        <div id="mobile-menu" class="hidden md:hidden mt-4 bg-black/30 backdrop-blur-md rounded-lg">
+            <a href="index.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Home</a>
+            <a href="sign-in.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign In</a>
+        </div>
     </header>
 
     <!-- Main Content Area -->
@@ -123,6 +194,15 @@
                         }
                     })
                     .catch(error => console.error('Error:', error));
+            });
+        }
+
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
             });
         }
     });

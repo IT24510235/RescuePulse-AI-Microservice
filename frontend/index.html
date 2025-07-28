@@ -21,11 +21,8 @@
         ========================================
         */
         body {
-            /* Sets the default font for the entire page */
             font-family: 'Inter', sans-serif;
-            /* Prevents horizontal scrolling for a clean look */
             overflow-x: hidden;
-            /* A dark base color that complements the background */
             background-color: #0a0a14;
         }
 
@@ -34,11 +31,8 @@
         ========================================
         */
         #main-container {
-            /* CHANGED TO RELATIVE PATH */
             background-image: url('assets/images/homepage.jpeg');
-            /* Ensures the background image covers the entire container */
             background-size: cover;
-            /* Centers the background image */
             background-position: center;
         }
 
@@ -47,16 +41,12 @@
         ========================================
         */
         .glass-panel {
-            /* Semi-transparent background to create the glass effect */
             background: rgba(20, 20, 30, 0.4);
-            /* This is the magic for the frosted glass blur */
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* For Safari support */
-            /* A subtle border to define the panel's edge */
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* A subtle outer glow to make the panel pop */
         .panel-glow {
             box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
         }
@@ -65,18 +55,13 @@
         BUTTONS
         ========================================
         */
-        /* Styling for the main "Activate Shield" button */
         .glow-button {
-            /* The orange glow effect */
             box-shadow: 0 0 15px rgba(251, 146, 60, 0.5), 0 0 30px rgba(251, 146, 60, 0.3);
-            /* Smooth transition for the hover effect */
             transition: all 0.3s ease-in-out;
         }
 
         .glow-button:hover {
-            /* Makes the button slightly larger on hover */
             transform: scale(1.05);
-            /* Intensifies the glow on hover */
             box-shadow: 0 0 25px rgba(251, 146, 60, 0.7), 0 0 45px rgba(251, 146, 60, 0.5);
         }
 
@@ -84,7 +69,6 @@
         WAVY LINES DECORATION
         ========================================
         */
-        /* This animation "draws" the SVG lines on screen */
         @keyframes draw {
             to {
                 stroke-dashoffset: 0;
@@ -92,11 +76,111 @@
         }
 
         .wavy-line {
-            /* These two properties set up the line drawing animation */
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
-            /* The animation will take 5 seconds to complete */
             animation: draw 5s ease-out forwards;
+        }
+
+        /* ========================================
+        MOBILE-RESPONSIVE ADJUSTMENTS
+        ========================================
+        */
+        @media (max-width: 768px) {
+            /* Header Adjustments */
+            header {
+                padding: 1rem;
+            }
+
+            nav .flex {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav .space-x-8 {
+                display: none;
+            }
+
+            nav .space-x-4 {
+                display: none;
+            }
+
+            #mobile-menu {
+                width: 100%;
+                padding: 1rem;
+            }
+
+            #mobile-menu a {
+                padding: 1rem;
+                font-size: 1.125rem;
+                display: block;
+                width: 100%;
+            }
+
+            #mobile-menu-button {
+                padding: 0.5rem;
+            }
+
+            /* Main Content Adjustments */
+            main {
+                margin-top: 2rem;
+                padding: 0 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+
+            p {
+                font-size: 1rem;
+                max-width: 90%;
+                line-height: 1.5;
+            }
+
+            #interactive-panel {
+                max-width: 100%;
+                padding: 0.5rem; /* Reduced padding */
+                border-radius: 1rem;
+            }
+
+            #data-readout {
+                width: 100%;
+                font-size: 0.75rem; /* Reduced from 0.875rem */
+                padding: 0.25rem; /* Reduced padding */
+                line-height: 1.2; /* Tighter line spacing */
+            }
+
+            .md:w-1/4, .md:w-3/4 {
+            width: 100%;
+        }
+
+            #map-image {
+                height: 150px; /* Reduced from 200px */
+                object-fit: cover;
+                width: 100%;
+            }
+
+            .glow-button {
+                padding: 0.5rem 1rem; /* Reduced padding */
+                font-size: 0.875rem; /* Reduced from 1rem */
+                width: 100%;
+                text-align: center;
+            }
+
+            /* Panel Header Adjustments */
+            #interactive-panel .mb-4 {
+                margin-bottom: 0.25rem; /* Reduced margin */
+            }
+
+            #interactive-panel .h-4, #interactive-panel .w-4 {
+                height: 3px; /* Reduced SVG size */
+                width: 3px;
+            }
+
+            /* Wavy Lines Adjustment */
+            .wavy-line {
+                stroke-width: 1;
+            }
         }
     </style>
 </head>
@@ -119,6 +203,7 @@
 
             <!-- Desktop Navigation Links -->
             <div class="hidden md:flex items-center space-x-8 text-gray-300">
+                <a href="index.html" class="text-gray-300 hover:text-white transition-colors">Home</a>
                 <a href="docs.html" class="hover:text-white transition-colors">Docs</a>
                 <a href="aboutus.html" class="hover:text-white transition-colors">About</a>
                 <a href="sign-in.html" class="hover:text-white transition-colors">Sign In</a>
@@ -139,6 +224,7 @@
         </nav>
         <!-- Mobile Menu (hidden by default) -->
         <div id="mobile-menu" class="hidden md:hidden mt-4 bg-black/30 backdrop-blur-md rounded-lg">
+            <a href="index.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Home</a>
             <a href="docs.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Docs</a>
             <a href="aboutus.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">About</a>
             <a href="sign-in.html" class="block py-2 px-4 text-sm hover:bg-gray-700 rounded">Sign In</a>
@@ -168,9 +254,9 @@
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+            <div class="flex flex-col md:flex-row gap-2 md:gap-8"> <!-- Reduced gap to 2 -->
                 <!-- Left Side Data Readout -->
-                <div class="w-full md:w-1/4 space-y-4 text-left text-sm text-gray-300 font-mono" id="data-readout">
+                <div class="w-full md:w-1/4 space-y-2 text-left text-sm text-gray-300 font-mono" id="data-readout"> <!-- Reduced space-y to 2 -->
                     <p id="time">Loading...</p>
                     <p id="metrics">Loading...</p>
                     <p id="rainfall">Loading...</p>
@@ -186,7 +272,7 @@
             </div>
 
             <!-- Activate Shield Button -->
-            <div class="mt-8 text-center">
+            <div class="mt-4 text-center"> <!-- Reduced mt to 4 -->
                 <a href="#" id="activate-button" class="inline-block bg-orange-500 text-white font-bold text-lg px-16 py-4 rounded-full glow-button">
                     Activate Shield
                 </a>
@@ -224,7 +310,7 @@
             document.getElementById('time').textContent = data.time || 'Loading...';
             document.getElementById('metrics').textContent = data.metrics || 'Loading...';
             document.getElementById('rainfall').textContent = `Rainfall: ${data.rainfall || 'N/A'}M`;
-            document.getElementById('wind').textContent = `Wind: ${data.wind || 'N/A'}M`;
+            document.getElementById('wind').textContent = `Wind: ${data.wind || 'N/A'}M';
             document.getElementById('last-update').textContent = data.lastUpdate || 'Loading...';
         }
 
