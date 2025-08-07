@@ -3,277 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - AI-EmergencyShield</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
-
-    <!-- Tailwind CSS -->
+    <title>RescuePulse - Disaster Response Dashboard</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#0a0a14',
+                        'secondary-dark': '#14141e',
+                        'panel-dark': 'rgba(20, 20, 30, 0.7)',
+                        'accent-blue': '#38bdf8',
+                        'accent-orange': '#fb923c',
+                        'accent-red': '#f43f5e',
+                        'accent-emerald': '#10b981',
+                        'panel-light': 'rgba(255, 255, 255, 0.05)',
+                        'border-light': 'rgba(255, 255, 255, 0.1)',
+                        'text-primary': '#f0f0f5',
+                        'text-secondary': '#a0a0b0',
+                    },
+                    boxShadow: {
+                        'glow-orange': '0 0 15px rgba(251, 146, 60, 0.4)',
+                        'glow-blue': '0 0 15px rgba(56, 189, 248, 0.4)',
+                        'glow-red': '0 0 15px rgba(244, 63, 94, 0.4)',
+                    },
+                }
+            }
+        }
+    </script>
 
     <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        .pulse-animation {
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+        
+        @keyframes gradient-pulse {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0a0a14;
-            overflow-x: hidden;
+            background: radial-gradient(circle at top right, #0a0a14 0%, #000000 70%);
+            color: #f0f0f5;
+            overflow: hidden;
+            background-size: 200% 200%;
+            animation: gradient-pulse 20s ease infinite;
         }
-        #main-container {
-            background-image: url('./assets/images/homepage.jpeg');
-            background-size: cover;
-            background-position: center;
-            min-height: 100vh;
-            display: flex;
-            flex-col;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
+        
+        .font-mono { font-family: 'Roboto Mono', monospace; }
+        
         .glass-panel {
-            background: rgba(20, 20, 30, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(20, 20, 30, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .panel-glow {
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.1);
-        }
+        
         .glow-button {
-            box-shadow: 0 0 15px rgba(251, 146, 60, 0.5);
             transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 15px rgba(251, 146, 60, 0.4);
+            background: linear-gradient(90deg, #fb923c, #f43f5e);
         }
-        .glow-button:hover {
-            transform: scale(1.05);
+        .glow-button:hover:not(:disabled) {
+            transform: scale(1.03);
             box-shadow: 0 0 25px rgba(251, 146, 60, 0.7);
         }
-        .wavy-line {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: draw 5s ease-out forwards;
+        .glow-button:disabled {
+            cursor: not-allowed;
+            background: #4a5568;
+            box-shadow: none;
         }
-        @keyframes draw { to { stroke-dashoffset: 0; } }
-        #map { height: 400px; width: 100%; }
-        .sidebar {
-            transition: transform 0.3s ease-in-out;
+        
+        .glow-button-blue {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+            background: linear-gradient(90deg, #38bdf8, #0ea5e9);
         }
-        .sidebar.hidden {
-            transform: translateX(-100%);
+        .glow-button-blue:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.7);
         }
-        @media (max-width: 768px) {
-            .glass-panel { padding: 1rem; }
-            h2 { font-size: 1.5rem; }
-            #csvForm input, #map { width: 100%; }
-            .glow-button { width: 100%; padding: 0.5rem; }
-            .sidebar { width: 250px; position: fixed; top: 0; left: 0; height: 100%; z-index: 30; }
-            .sidebar.hidden { transform: translateX(-250px); }
-            main { margin-left: 0; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+        
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background: rgba(20, 20, 30, 0.9) !important;
+            color: #f0f0f5 !important;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        @media (min-width: 769px) {
-            .sidebar { position: fixed; top: 0; left: 0; height: 100%; z-index: 20; }
-            main { margin-left: 64px; }
+        .leaflet-container a.leaflet-popup-close-button { color: #a0a0b0 !important; }
+        .leaflet-control-attribution { display: none !important; }
+        
+        /* Map Legend */
+        .legend {
+            padding: 10px 12px;
+            font: 12px/1.5 'Inter', sans-serif;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            color: #a0a0b0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.9;
+            border-radius: 50%;
+        }
+        
+        #toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .toast {
+            min-width: 300px; display: flex; align-items: center; gap: 0.75rem; padding: 1rem;
+            border-radius: 0.75rem; border-left-width: 4px;
+            box-shadow: 0 10px 25px -3px rgba(0,0,0,0.2), 0 4px 8px -2px rgba(0,0,0,0.1);
+            transform: translateX(120%); transition: transform 0.4s ease-in-out;
+            backdrop-filter: blur(10px);
+            background: rgba(20, 20, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: #10B981; }
+        .toast.error { border-left-color: #EF4444; }
+        .toast.info { border-left-color: #3B82F6; }
+        
+        .interactive-table tbody tr { cursor: pointer; transition: background-color 0.2s ease; }
+        .interactive-table tbody tr:hover { background-color: rgba(56, 189, 248, 0.1); }
+        
+        .risk-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(90deg, rgba(20, 20, 30, 0.9), rgba(10, 10, 20, 0.9));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sri-lanka-overlay {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.8);
+            border-radius: 12px;
+            padding: 12px;
+            width: 180px;
+            height: 180px;
+            z-index: 400;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sri-lanka-mini-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .sri-lanka-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(20, 20, 30, 0.8);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #38bdf8;
+            z-index: 500;
         }
     </style>
 </head>
-<body class="text-white">
+<body class="bg-primary-dark">
 
-<div id="main-container" class="relative">
-    <div class="absolute inset-0 bg-black/50 z-0"></div>
+<div id="toast-container"></div>
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar w-64 bg-gray-900/80 p-4 h-screen fixed z-20 md:block">
-        <h3 class="text-xl font-bold mb-4">Menu</h3>
-        <ul class="space-y-2">
-            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Dashboard</a></li>
-            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Alert History</a></li>
-            <li><a href="#" class="block p-2 hover:bg-gray-700 rounded">Settings</a></li>
-            <li><a href="login.html?logout=true" class="block p-2 hover:bg-gray-700 rounded">Logout</a></li>
-        </ul>
+<div class="flex h-screen">
+    <aside id="sidebar" class="w-64 bg-secondary-dark p-6 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out fixed md:relative h-full z-30 -translate-x-full md:translate-x-0 border-r border-border-light">
+        <div class="flex items-center gap-3 mb-10">
+            <div class="bg-accent-red/20 p-3 rounded-xl pulse-animation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent-red"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-wider text-white">RescuePulse</h1>
+                <p class="text-xs text-text-secondary mt-1">Disaster Response Dashboard</p>
+            </div>
+        </div>
+        
+        <div class="mb-8 p-4 glass-panel">
+            <div class="flex items-center gap-3">
+                <div class="bg-accent-blue/10 p-2 rounded-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-text-secondary">Logged in as</p>
+                    <p class="font-medium text-white">Admin User</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="flex-grow">
+            <ul class="space-y-3">
+                <li><a href="#" class="flex items-center gap-3 p-3 rounded-xl bg-accent-blue/10 text-accent-blue font-semibold"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> Dashboard</a></li>
+                <li><a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-panel-light text-text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"></path><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-6l-3.4-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.8 1.1z"></path></svg> Alert History</a></li>
+                <li><a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-panel-light text-text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l-.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0 2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg> Settings</a></li>
+                <li><a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-panel-light text-text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Team Management</a></li>
+                <li><a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-panel-light text-text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Resources</a></li>
+            </ul>
+        </nav>
+        
+        <div class="mt-auto pt-4 border-t border-border-light">
+            <a href="#" id="sidebar-logout" class="flex items-center gap-3 p-3 rounded-xl hover:bg-accent-red/10 text-accent-red">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </a>
+        </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
-        <header class="p-4">
-            <nav class="flex justify-between">
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
+    <div class="flex-1 flex flex-col h-screen overflow-y-auto">
+        <header class="dashboard-header p-4 flex justify-between items-center sticky top-0 z-20">
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+            <h2 class="text-xl font-bold hidden md:block">Disaster Response Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-secondary-dark rounded-full">
+                    <div class="w-2 h-2 bg-accent-emerald rounded-full"></div>
+                    <span class="font-mono text-xs text-text-secondary">LIVE</span>
                 </div>
-                <div class="hidden md:block">
-                    <a href="login.html?logout=true" class="px-4 py-2 rounded-full border border-white/50 hover:bg-white/10">Logout</a>
+                <span class="font-mono text-sm text-text-secondary" id="current-time"></span>
+                <div class="relative" id="user-menu-container">
+                    <div class="flex items-center gap-3 cursor-pointer" id="user-avatar">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-blue to-accent-emerald flex items-center justify-center text-white font-bold">AU</div>
+                        <div class="hidden md:block">
+                            <p class="text-sm font-medium text-white">Admin User</p>
+                            <p class="text-xs text-text-secondary">Administrator</p>
+                        </div>
+                    </div>
+                    <div id="logout-menu" class="hidden absolute right-0 mt-2 w-48 bg-secondary-dark rounded-lg shadow-lg py-1 z-50 border border-border-light">
+                        <a href="#" id="logoutButton" class="flex items-center gap-3 px-4 py-2 text-sm text-accent-red hover:bg-accent-red/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Logout
+                        </a>
+                    </div>
                 </div>
-            </nav>
+            </div>
         </header>
 
-        <div class="container mx-auto p-4">
-            <h2 class="text-4xl font-bold tracking-tight">User Dashboard</h2>
-            <p class="mt-4 text-gray-300 max-w-xl">Upload CSV data, view predictions, and monitor alerts.</p>
-
-            <!-- Glass Panel -->
-            <div id="interactive-panel" class="glass-panel max-w-5xl mt-10 panel-glow">
-                <form id="csvForm" class="space-y-4">
-                    <div>
-                        <input type="file" id="csvFile" accept=".csv" class="w-full p-2 rounded bg-gray-800 border border-gray-700" required>
+        <main class="flex-1 p-4 md:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass-panel p-5 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <p class="text-text-secondary text-sm">Active Alerts</p>
+                            <div class="bg-accent-red/10 p-1 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            </div>
+                        </div>
+                        <p id="kpi-active-alerts" class="text-3xl font-bold text-accent-red mt-2">8</p>
+                        <div class="mt-3 pt-2 border-t border-border-light">
+                            <p class="text-xs text-text-secondary flex items-center">
+                                <span class="text-accent-emerald flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                    +2 in last hour
+                                </span>
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <input type="number" id="temperature" placeholder="Temperature (°C)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                    
+                    <div class="glass-panel p-5 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <p class="text-text-secondary text-sm">Highest Risk</p>
+                            <div class="bg-accent-orange/10 p-1 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            </div>
+                        </div>
+                        <p id="kpi-highest-risk" class="text-2xl font-bold truncate text-white mt-2">Colombo District</p>
+                        <div class="flex gap-2 mt-3">
+                            <span class="px-2 py-1 bg-accent-red/10 text-accent-red text-xs rounded-full">Flood</span>
+                            <span class="px-2 py-1 bg-accent-orange/10 text-accent-orange text-xs rounded-full">High Risk</span>
+                        </div>
                     </div>
-                    <div>
-                        <input type="number" id="humidity" placeholder="Humidity (%)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
+                    
+                    <div class="glass-panel p-5 flex flex-col">
+                        <div class="flex items-center justify-between">
+                            <p class="text-text-secondary text-sm">Response Teams</p>
+                            <div class="bg-accent-blue/10 p-1 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-white mt-2">12</p>
+                        <div class="mt-3 pt-2 border-t border-border-light">
+                            <p class="text-xs text-text-secondary">8 teams deployed</p>
+                        </div>
                     </div>
-                    <div>
-                        <input type="number" id="windSpeed" placeholder="Wind Speed (m/s)" class="w-full p-2 rounded bg-gray-800 border border-gray-700">
-                    </div>
-                    <button type="submit" class="glow-button bg-orange-500 text-white font-bold py-2 px-6 rounded-full">Upload and Predict</button>
-                </form>
-                <div id="predictionResult" class="mt-4 text-lg font-mono text-gray-300"></div>
-                <div id="alertHistory" class="mt-4 text-sm text-gray-400">
-                    <h3 class="font-bold">Alert History</h3>
-                    <ul id="alertList"></ul>
+                </div>
+                
+                <div class="relative glass-panel h-96 lg:h-auto lg:flex-grow rounded-2xl overflow-hidden">
+                    <div id="map" class="h-full w-full"></div>
+                    <div class="sri-lanka-label">SRI LANKA - DISASTER ALERTS</div>
                 </div>
             </div>
 
-            <!-- Map Section -->
-            <div id="map" class="glass-panel mt-6 panel-glow"></div>
-        </div>
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <div class="glass-panel p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                        Risk Prediction
+                    </h3>
+                    
+                    <div class="flex border-b border-border-light mb-4">
+                        <button id="manual-tab" class="py-2 px-4 text-sm font-semibold border-b-2 border-accent-blue text-white">Manual Input</button>
+                        <button id="csv-tab" class="py-2 px-4 text-sm font-semibold border-b-2 border-transparent text-text-secondary hover:text-white">Batch CSV</button>
+                    </div>
+                    
+                    <form id="manualForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-text-secondary mb-1">Location</label>
+                            <input type="text" id="location" placeholder="Enter location name" class="w-full p-3 rounded-lg bg-secondary-dark border border-border-light focus:ring-2 focus:ring-accent-blue focus:outline-none" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-text-secondary mb-1">Temperature (°C)</label>
+                                <input type="number" step="0.1" id="temperature" placeholder="30.5" class="w-full p-3 rounded-lg bg-secondary-dark border border-border-light focus:ring-2 focus:ring-accent-blue focus:outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-text-secondary mb-1">Humidity (%)</label>
+                                <input type="number" step="0.1" id="humidity" placeholder="85.2" class="w-full p-3 rounded-lg bg-secondary-dark border border-border-light focus:ring-2 focus:ring-accent-blue focus:outline-none" required>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-text-secondary mb-1">Wind Speed (m/s)</label>
+                            <input type="number" step="0.1" id="windSpeed" placeholder="12.3" class="w-full p-3 rounded-lg bg-secondary-dark border border-border-light focus:ring-2 focus:ring-accent-blue focus:outline-none" required>
+                        </div>
+                        
+                        <button type="submit" class="glow-button w-full text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center">
+                            <span>Run Prediction</span>
+                        </button>
+                    </form>
+                </div>
 
-        <!-- Wavy Lines -->
-        <div class="absolute bottom-0 left-0 w-full h-48 opacity-20 overflow-hidden -z-10">
-            <svg class="w-full h-full" viewBox="0 0 1440 320">
-                <path class="wavy-line" fill="none" stroke="#06b6d4" stroke-width="2" d="M0,224L40,213.3C80,203,160,181,240,186.7C320,192,400,224,480,213.3C560,203,640,149,720,149.3C800,149,880,203,960,224C1040,245,1120,235,1200,208C1280,181,1360,139,1400,117.3L1440,96"></path>
-                <path class="wavy-line" style="animation-delay: 1.5s;" fill="none" stroke="#22d3ee" stroke-width="1" d="M0,160L48,176C96,192,192,224,288,218.7C384,213,480,171,576,149.3C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128"></path>
-            </svg>
-        </div>
-    </main>
+                <div class="glass-panel p-6 flex flex-col flex-grow min-h-[300px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"></path><path d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-6l-3.4-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.8 1.1z"></path></svg>
+                            Recent Alerts
+                        </h3>
+                        <button class="text-xs text-accent-blue font-medium hover:underline">View All</button>
+                    </div>
+                    
+                    <div class="flex-grow overflow-y-auto -mr-3 pr-2">
+                        <table class="w-full text-left text-sm interactive-table">
+                            <thead>
+                                <tr class="border-b border-border-light text-text-secondary">
+                                    <th class="py-3">Location</th>
+                                    <th class="py-3">Risk</th>
+                                    <th class="py-3">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="alertList">
+                                <tr data-lat="6.9271" data-lng="79.8612">
+                                    <td class="py-3.5 flex items-center gap-2">
+                                        <span class="risk-indicator bg-accent-red"></span>
+                                        Colombo
+                                    </td>
+                                    <td class="py-3.5 font-semibold text-accent-red">High</td>
+                                    <td class="py-3.5 text-text-secondary">12:45 PM</td>
+                                </tr>
+                                <tr data-lat="7.2906" data-lng="80.6337">
+                                    <td class="py-3.5 flex items-center gap-2">
+                                        <span class="risk-indicator bg-accent-orange"></span>
+                                        Kandy
+                                    </td>
+                                    <td class="py-3.5 font-semibold text-accent-orange">Medium</td>
+                                    <td class="py-3.5 text-text-secondary">12:30 PM</td>
+                                </tr>
+                                <tr data-lat="6.0535" data-lng="80.2210">
+                                    <td class="py-3.5 flex items-center gap-2">
+                                        <span class="risk-indicator bg-accent-blue"></span>
+                                        Galle
+                                    </td>
+                                    <td class="py-3.5 font-semibold text-accent-blue">Low</td>
+                                    <td class="py-3.5 text-text-secondary">11:15 AM</td>
+                                </tr>
+                                <tr data-lat="8.3114" data-lng="80.4037">
+                                    <td class="py-3.5 flex items-center gap-2">
+                                        <span class="risk-indicator bg-accent-red"></span>
+                                        Anuradhapura
+                                    </td>
+                                    <td class="py-3.5 font-semibold text-accent-red">High</td>
+                                    <td class="py-3.5 text-text-secondary">10:45 AM</td>
+                                </tr>
+                                <tr data-lat="7.2964" data-lng="80.6350">
+                                    <td class="py-3.5 flex items-center gap-2">
+                                        <span class="risk-indicator bg-accent-orange"></span>
+                                        Matale
+                                    </td>
+                                    <td class="py-3.5 font-semibold text-accent-orange">Medium</td>
+                                    <td class="py-3.5 text-text-secondary">10:20 AM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="p-4 text-center text-xs text-text-secondary border-t border-border-light">
+            <p>RescuePulse Disaster Response System v2.0 | Sri Lanka National Disaster Relief | Real-time Monitoring</p>
+        </footer>
+    </div>
 </div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div class="sri-lanka-overlay hidden md:block">
+    <div class="text-xs font-medium text-white mb-2">Sri Lanka Overview</div>
+    <div id="sri-lanka-mini-map" class="sri-lanka-mini-map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const csvForm = document.getElementById('csvForm');
-        const predictionResult = document.getElementById('predictionResult');
-        const alertList = document.getElementById('alertList');
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const sidebar = document.getElementById('sidebar');
-
-        // Mobile Menu Toggle
-        if (mobileMenuButton && sidebar) {
-            mobileMenuButton.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                if (!sidebar.classList.contains('hidden')) {
-                    sidebar.style.transform = 'translateX(0)';
-                } else {
-                    sidebar.style.transform = 'translateX(-250px)';
-                }
-            });
-        }
-
-        // Initialize Map
-        const map = L.map('map').setView([7.8731, 80.7718], 7); // Centered on Sri Lanka
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-        }).addTo(map);
-
-        // Fetch and Display Alerts on Map
-        async function updateMap() {
-            try {
-                const response = await fetch('http://localhost:8083/alert/list', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const alerts = await response.json();
-                map.eachLayer(layer => {
-                    if (layer instanceof L.Marker) map.removeLayer(layer);
-                });
-                alerts.forEach(alert => {
-                    L.marker([alert.latitude, alert.longitude]).addTo(map)
-                        .bindPopup(`${alert.location}: ${alert.risk_level} - ${alert.message}`);
-                });
-            } catch (error) {
-                console.error('Error loading alerts:', error);
-            }
-        }
-        updateMap(); // Initial load
-        setInterval(updateMap, 30000); // Update every 30 seconds
-
-        // CSV Upload and Prediction
-        csvForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('csvFile').files[0];
-            const temperature = document.getElementById('temperature').value;
-            const humidity = document.getElementById('humidity').value;
-            const windSpeed = document.getElementById('windSpeed').value;
-            const formData = new FormData();
-            formData.append('csv', file);
-
-            try {
-                const response = await fetch('http://localhost:8081/data/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const result = await response.json();
-                if (result.status === 'success') {
-                    let data = {};
-                    if (file) {
-                        const csvData = await file.text();
-                        const lines = csvData.split('\n').filter(line => line.trim());
-                        data = lines[1].split(','); // Assuming header + first row
-                    } else {
-                        data = [null, null, null, temperature, humidity, windSpeed];
-                    }
-                    const aiResponse = await fetch('http://localhost:8082/ai/predict', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                        body: JSON.stringify({
-                            location: data[0] || 'Unknown',
-                            temperature: parseFloat(data[3] || temperature) || 0,
-                            humidity: parseFloat(data[4] || humidity) || 0,
-                            wind_speed: parseFloat(data[5] || windSpeed) || 0
-                        })
-                    });
-                    const aiResult = await aiResponse.json();
-                    predictionResult.textContent = `Prediction: ${aiResult.risk_level} - ${aiResult.message}`;
-                    updateMap(); // Update map after prediction
-                } else {
-                    predictionResult.textContent = 'Upload failed';
-                }
-            } catch (error) {
-                predictionResult.textContent = 'Error processing data';
-                console.error(error);
-            }
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize main map
+    const mainMap = L.map('map', { zoomControl: false }).setView([7.8731, 80.7718], 7);
+    
+    // Add tile layer with dark theme
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
+    }).addTo(mainMap);
+    
+    // Add zoom control to the bottom right
+    L.control.zoom({ position: 'bottomright' }).addTo(mainMap);
+    
+    // Add legend
+    const legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = '<h4 class="text-xs font-bold mb-2 text-white">RISK LEVEL</h4>';
+        div.innerHTML += '<div class="flex items-center mb-1"><i style="background:#f43f5e"></i><span class="text-xs">High Risk</span></div>';
+        div.innerHTML += '<div class="flex items-center mb-1"><i style="background:#fb923c"></i><span class="text-xs">Medium Risk</span></div>';
+        div.innerHTML += '<div class="flex items-center"><i style="background:#38bdf8"></i><span class="text-xs">Low Risk</span></div>';
+        return div;
+    };
+    legend.addTo(mainMap);
+    
+    // Add markers for Sri Lanka cities
+    const markers = [
+        { name: "Colombo", lat: 6.9271, lng: 79.8612, risk: "High" },
+        { name: "Kandy", lat: 7.2906, lng: 80.6337, risk: "Medium" },
+        { name: "Galle", lat: 6.0535, lng: 80.2210, risk: "Low" },
+        { name: "Jaffna", lat: 9.6615, lng: 80.0255, risk: "Medium" },
+        { name: "Anuradhapura", lat: 8.3114, lng: 80.4037, risk: "High" },
+        { name: "Trincomalee", lat: 8.5922, lng: 81.2350, risk: "Medium" },
+        { name: "Matara", lat: 5.9483, lng: 80.5353, risk: "Low" },
+        { name: "Ratnapura", lat: 6.6806, lng: 80.3997, risk: "High" },
+    ];
+    
+    // Add markers to map
+    markers.forEach(marker => {
+        let color;
+        if (marker.risk === "High") color = "#f43f5e";
+        else if (marker.risk === "Medium") color = "#fb923c";
+        else color = "#38bdf8";
+        
+        const customIcon = L.divIcon({
+            html: `<div class="w-4 h-4 rounded-full" style="background-color: ${color}; box-shadow: 0 0 12px ${color};"></div>`,
+            className: '',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
         });
-
-        // Fetch Alert History
-        async function updateAlertHistory() {
-            try {
-                const response = await fetch('http://localhost:8083/alert/list', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                const alerts = await response.json();
-                alertList.innerHTML = alerts.map(alert => `<li>${alert.location} - ${alert.risk_level} (${alert.created_at})</li>`).join('');
-            } catch (error) {
-                alertList.innerHTML = '<li>Error loading history</li>';
-            }
-        }
-        updateAlertHistory(); // Initial load
-        setInterval(updateAlertHistory, 30000); // Update every 30 seconds
-
-        // Logout Handling
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('logout')) {
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
+        
+        L.marker([marker.lat, marker.lng], { icon: customIcon })
+            .addTo(mainMap)
+            .bindPopup(`<div class="font-sans"><strong class="text-base">${marker.name}</strong><br>Risk: <span class="font-bold" style="color:${color};">${marker.risk}</span><p class="text-xs mt-2 text-text-secondary">Potential flood risk detected</p></div>`);
+    });
+    
+    // Initialize mini map
+    const miniMap = L.map('sri-lanka-mini-map', { 
+        zoomControl: false,
+        attributionControl: false,
+        dragging: false,
+        touchZoom: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false
+    }).setView([7.8731, 80.7718], 7);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 20
+    }).addTo(miniMap);
+    
+    // Add rectangle to show main map view
+    const miniMapRectangle = L.rectangle(mainMap.getBounds(), {
+        color: "#38bdf8",
+        weight: 1,
+        fillOpacity: 0.1
+    }).addTo(miniMap);
+    
+    // Update mini map rectangle when main map moves
+    mainMap.on('move', () => {
+        miniMapRectangle.setBounds(mainMap.getBounds());
+    });
+    
+    // UI Event Listeners
+    document.getElementById('mobile-menu-button').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('-translate-x-full');
+    });
+    
+    document.getElementById('user-avatar').addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('logout-menu').classList.toggle('hidden');
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!document.getElementById('user-menu-container').contains(e.target)) {
+            document.getElementById('logout-menu').classList.add('hidden');
         }
     });
+    
+    const logoutButtons = document.querySelectorAll('#logoutButton, #sidebar-logout');
+    logoutButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            showToast('Logging out...', 'info');
+            setTimeout(() => {
+                window.location.href = 'sign-up.html';
+            }, 1500);
+        });
+    });
+    
+    // Tab switching
+    document.getElementById('manual-tab').addEventListener('click', () => {
+        document.getElementById('manual-tab').classList.add('border-accent-blue', 'text-white');
+        document.getElementById('manual-tab').classList.remove('border-transparent', 'text-text-secondary');
+        document.getElementById('csv-tab').classList.add('border-transparent', 'text-text-secondary');
+        document.getElementById('csv-tab').classList.remove('border-accent-blue', 'text-white');
+        document.getElementById('manualForm').classList.remove('hidden');
+        // document.getElementById('csvForm').classList.add('hidden'); // This line causes an error if csvForm doesn't exist
+    });
+    
+    const csvTab = document.getElementById('csv-tab');
+    if (csvTab) {
+        csvTab.addEventListener('click', () => {
+            csvTab.classList.add('border-accent-blue', 'text-white');
+            csvTab.classList.remove('border-transparent', 'text-text-secondary');
+            document.getElementById('manual-tab').classList.add('border-transparent', 'text-text-secondary');
+            document.getElementById('manual-tab').classList.remove('border-accent-blue', 'text-white');
+            // document.getElementById('csvForm').classList.remove('hidden');
+            document.getElementById('manualForm').classList.add('hidden');
+        });
+    }
+
+    // Form submission
+    document.getElementById('manualForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        showToast('Running prediction analysis...', 'info');
+        setTimeout(() => {
+            showToast('Prediction completed: High risk detected!', 'success');
+        }, 2000);
+    });
+    
+    // Table row click
+    document.querySelectorAll('#alertList tr').forEach(row => {
+        row.addEventListener('click', () => {
+            const lat = parseFloat(row.dataset.lat);
+            const lng = parseFloat(row.dataset.lng);
+            mainMap.flyTo([lat, lng], 12);
+        });
+    });
+    
+    // Show toast function
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <div class="p-1 rounded-full bg-white/10">
+                    ${type === 'success' ? 
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>' :
+                    type === 'error' ? 
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' :
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'}
+                </div>
+                <div class="font-medium">${message}</div>
+            </div>
+            <button class="ml-auto text-white/70 hover:text-white">&times;</button>
+        `;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        const removeToast = () => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        };
+        
+        toast.querySelector('button').onclick = removeToast;
+        setTimeout(removeToast, 5000);
+    }
+    
+    // Update time
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
+    
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Simulate live data updates
+    setInterval(() => {
+        const activeAlerts = document.getElementById('kpi-active-alerts');
+        const count = parseInt(activeAlerts.textContent);
+        if (count < 10) {
+            activeAlerts.textContent = count + 1;
+        }
+    }, 15000);
+});
 </script>
 </body>
 </html>

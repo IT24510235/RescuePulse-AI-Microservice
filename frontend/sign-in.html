@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI-EmergencyShield - Sign In</title>
 
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
 
-    <!-- Tailwind CSS for rapid UI development -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -118,14 +116,11 @@
 </head>
 <body class="bg-gray-900 text-white">
 
-<!-- Main container -->
 <div id="main-container" class="relative min-h-screen w-full flex flex-col items-center justify-center p-4">
     <div class="absolute inset-0 bg-black/50 z-0"></div>
 
-    <!-- Header / Navigation Section -->
     <header class="absolute top-0 left-0 right-0 z-20 p-4 md:p-6">
         <nav class="container mx-auto flex justify-between items-center">
-            <!-- Logo (now clickable to index.html) -->
             <a href="index.html" class="flex items-center space-x-2">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 14v-1m-6.08-4.92l.707-.707m9.856 0l-.707-.707M4 12H3m18 0h-1m-5.92-6.08l-.707.707m0 9.856l.707.707"></path></svg>
                 <span class="text-2xl font-bold tracking-wider">RescuePulse</span>
@@ -145,12 +140,10 @@
         </div>
     </header>
 
-    <!-- Main Content Area -->
     <main class="relative z-10 flex flex-col items-center text-center mt-32 md:mt-16">
         <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Sign In</h1>
         <p class="mt-4 text-lg text-gray-300 max-w-xl">Access AI-EmergencyShield to manage disaster response in Sri Lanka. <span id="current-time" class="text-sm text-gray-500"></span></p>
 
-        <!-- Sign-in Form -->
         <div class="relative w-full max-w-md mt-10 glass-panel rounded-2xl p-6 panel-glow">
             <form id="sign-in-form" class="space-y-6">
                 <div>
@@ -189,8 +182,8 @@
                     .then(data => {
                         if (data.success) {
                             alert('Sign-in successful! Redirecting...');
-                            // Redirect to index.html or dashboard
-                            window.location.href = 'index.html';
+                            // Redirect to user-dashboard.html
+                            window.location.href = 'user-dashboard.html';
                         } else {
                             alert('Sign-in failed: ' + data.message);
                         }
