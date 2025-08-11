@@ -180,22 +180,24 @@
                 const username = document.getElementById('username').value;
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
-                // Placeholder for backend integration
-                fetch('http://localhost:9090/emergency/signup', {
+                fetch('/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ username, password })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Sign-up successful! Redirecting to Sign In...');
-                            window.location.href = 'sign-in.html';
-                        } else {
-                            alert('Sign-up failed: ' + data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        alert('Sign-up successful! Redirecting to Sign In...');
+                        window.location.href = 'sign-in.html';
+                    } else {
+                        alert('Sign-up failed: ' + (data.message || 'unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Sign-up failed: network error');
+                });
             });
         }
 

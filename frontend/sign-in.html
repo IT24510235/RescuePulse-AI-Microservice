@@ -172,23 +172,25 @@
                 e.preventDefault();
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
-                // Placeholder for backend integration
-                fetch('http://localhost:9090/emergency/signin', {
+                fetch('/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Sign-in successful! Redirecting...');
-                            // Redirect to user-dashboard.html
-                            window.location.href = 'user-dashboard.html';
-                        } else {
-                            alert('Sign-in failed: ' + data.message);
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        try { localStorage.setItem('rp_token', data.token || ''); } catch (e) {}
+                        alert('Sign-in successful! Redirecting...');
+                        window.location.href = 'user-dashboard.html';
+                    } else {
+                        alert('Sign-in failed: ' + (data.message || 'unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Sign-in failed: network error');
+                });
             });
         }
 
