@@ -8,33 +8,42 @@ type User record {|
     string password;
 |};
 
-// Configure CORS
-configurable http:CorsConfig corsConfig = {
-    allowOrigins: ["http://localhost:63342"],
-    allowMethods: ["POST"],
-    allowHeaders: ["Content-Type"]
-};
-
-listener http:Listener httpListener = new (9090, {
-    cors: corsConfig
-});
+listener http:Listener httpListener = new (9090);
 
 service /auth on httpListener {
-    resource function post signup(@http:Payload User user) returns json|error {
-        // Convert user record to a string
-        string userString = string:concat(user.username, ",", user.email, ",", user.password, "\n");
 
-        // Convert string to bytes for WritableByteChannel
+    resource function post signup(@http:Payload User user) returns http:Response|error {
+        http:Response res = new;
+
+        // Manual CORS headers
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        // Convert user record to CSV-style string
+        string userString = string:concat(user.username, ",", user.email, ",", user.password, "\n");
         byte[] userBytes = userString.toBytes();
 
-        // Append to users.txt in backend/src/logs
+        // Append to users.txt
         io:WritableByteChannel|error channel = io:openWritableFile("./backend/src/logs/users.txt", io:APPEND);
         if channel is io:WritableByteChannel {
-            var result = channel.write(userBytes, 0);
+            int _ = check channel.write(userBytes, 0); // Properly handle errors
             check channel.close();
-            return {status: "ok", message: "User registered successfully"};
+
+            res.setJsonPayload({status: "ok", message: "User registered successfully"});
         } else {
-            return {status: "error", message: "Failed to save user: " + channel.message()};
+            res.setJsonPayload({status: "error", message: "Failed to save user"});
         }
+
+        return res;
+    }
+
+    // Handle OPTIONS request for CORS preflight
+    resource function options signup(http:Caller caller, http:Request req) returns error? {
+        http:Response res = new;
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        check caller->respond(res);
     }
 }
