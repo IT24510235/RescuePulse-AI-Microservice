@@ -183,21 +183,21 @@
                 fetch('/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ username, password })
                 })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.status === 'ok') {
-                            alert('Sign-up successful! Redirecting to Sign In...');
-                            window.location.href = 'sign-in.html';
-                        } else {
-                            alert('Sign-up failed: ' + (data.message || 'unknown error'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Sign-up failed: network error');
-                    });
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        alert('Sign-up successful! Redirecting to Sign In...');
+                        window.location.href = 'sign-in.html';
+                    } else {
+                        alert('Sign-up failed: ' + (data.message || 'unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Sign-up failed: network error');
+                });
             });
         }
 
@@ -211,3 +211,5 @@
         }
     });
 </script>
+</body>
+</html>
