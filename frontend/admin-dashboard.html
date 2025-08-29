@@ -2,9 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="admin-container">
+        <!-- Side Panel -->
+        <div class="side-panel">
+            <div class="logo">RescuePulse</div>
+            <nav>
+                <ul>
+                    <li><a href="#" id="dashboardLink">Dashboard</a></li>
+                    <li><a href="#" id="notificationsLink">Notifications</a></li>
+                </ul>
+            </nav>
+        </div>
 
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <header>
+                <button id="logoutBtn">Logout</button>
+            </header>
+
+            <!-- Dynamic Content will be loaded here -->
+            <div id="contentArea">
+                <h2>Welcome to Admin Dashboard</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Handle navigation to Dashboard and Notifications
+        document.getElementById("dashboardLink").addEventListener("click", () => {
+            loadDashboard();
+        });
+
+        document.getElementById("notificationsLink").addEventListener("click", () => {
+            loadNotifications();
+        });
+
+        // Handle Logout
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            localStorage.removeItem("token");  // Remove token on logout
+            window.location.href = "/sign-in.html";  // Redirect to login page
+        });
+
+        // Load Dashboard Content
+        async function loadDashboard() {
+            const contentArea = document.getElementById("contentArea");
+            contentArea.innerHTML = `<h2>Admin Dashboard</h2><p>Overview of system statistics.</p>`;
+        }
+
+        // Load Notifications Content
+        async function loadNotifications() {
+            const contentArea = document.getElementById("contentArea");
+            const res = await fetch("http://localhost:8080/api/admin/notifications", {
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            });
+            const notifications = await res.json();
+            contentArea.innerHTML = `<h2>Notifications</h2><ul>${notifications.map(n => `<li>${n.message}</li>`).join('')}</ul>`;
+        }
+
+        // Initial Load for Dashboard
+        loadDashboard();
+    </script>
 </body>
 </html>
