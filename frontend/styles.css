@@ -1,0 +1,78 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Admin Container */
+.admin-container {
+    display: flex;
+}
+
+/* Side Panel */
+.side-panel {
+    width: 250px;
+    background-color: #333;
+    color: white;
+    height: 100vh;
+    padding-top: 20px;
+}
+
+.side-panel .logo {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 30px;
+}
+
+.side-panel nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.side-panel nav ul li {
+    padding: 10px;
+    text-align: center;
+}
+
+.side-panel nav ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.side-panel nav ul li a:hover {
+    background-color: #575757;
+}
+
+/* Main Content */
+.main-content {
+    flex-grow: 1;
+    background-color: #f4f4f4;
+    padding: 20px;
+    height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+}
+
+#logoutBtn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#logoutBtn:hover {
+    background-color: #d32f2f;
+}
+
+/* Content Area */
+#contentArea {
+    margin-top: 20px;
+}
